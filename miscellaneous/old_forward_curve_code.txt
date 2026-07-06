@@ -12,7 +12,7 @@ def forwardCurve(name: str):
   forwardCurves = pd.DataFrame(index = finalDisFacts.index, columns = finalDisFacts.columns, dtype = float)
   #print(forwardCurves)
   maturities = np.array(forwardCurves.columns)
-  #print(maturities) 
+  #print(maturities)
   for d, date in enumerate(forwardCurves.index):
     for i, col in enumerate(forwardCurves.columns):
       if "Mo" in col:
@@ -21,9 +21,8 @@ def forwardCurve(name: str):
       elif "Yr" in col:
         str = col.split()
         year = float(str[0])
-      #disFactDerivative = -math.log(finalDisFacts.loc[date, col])
-      #forwardCurves.loc[date, col] = disFactDerivative
-      forwardCurves.loc[date, col] = finalDisFacts.loc[date, col]
+      disFactDerivative = -math.log(finalDisFacts.loc[date, col])
+      forwardCurves.loc[date, col] = disFactDerivative
       #forwardCurves.loc[date, col] = np.interp(disFactDerivative, date, finalDisFacts.loc[date, col])
 
   return forwardCurves
@@ -40,18 +39,17 @@ def graph(pd):
       str = maturity.split()
       maturity = float(str[0])
       maturitiesNumeric.append(maturity)
-  
+
   for date in pd.index:
     forward = pd.loc[date].to_numpy(dtype = float)
-    forward = -np.log(forward)
-    interp = PchipInterpolator(maturitiesNumeric, forward).derivative()
+    interp = PchipInterpolator(maturitiesNumeric, forward)
     denseTimes = np.linspace(maturitiesNumeric[0], maturitiesNumeric[-1], 500)
     denseForward = interp(denseTimes)
     plt.plot(denseTimes, denseForward, label = date + " Interpolated")
-    #plt.plot(maturitiesNumeric, pd.loc[date], marker = 'o', label = date)  
+    #plt.plot(maturitiesNumeric, pd.loc[date], marker = 'o', label = date)
 
   plt.xlabel('Maturity (Converted to years for uniformity)')
-  plt.ylabel('Forward Rate')
+  plt.ylabel('Forward Curve')
   plt.title('Forward Curves of Discount Factors')
   plt.legend()
   plt.grid(True)
