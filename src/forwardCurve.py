@@ -1,68 +1,42 @@
 import sys
-sys.path.insert(0, "")
-from discountFactorParYield import calcDisFact
-import pandas as pd
-import math
-import numpy as np
+
 import matplotlib.pyplot as plt
-from scipy.interpolate import PchipInterpolator
+import numpy as np
+import pandas as pd
 
-def forwardCurve(name: str):
-  finalDisFacts = calcDisFact(name)
-  forwardCurves = pd.DataFrame(index = finalDisFacts.index, columns = finalDisFacts.columns, dtype = float)
-  #print(forwardCurves)
-  maturities = np.array(forwardCurves.columns)
-  #print(maturities) 
-  for d, date in enumerate(forwardCurves.index):
-    for i, col in enumerate(forwardCurves.columns):
-      if "Mo" in col:
-        str = col.split()
-        year = float(str[0]) / 12
-      elif "Yr" in col:
-        str = col.split()
-        year = float(str[0])
-      #disFactDerivative = -math.log(finalDisFacts.loc[date, col])
-      #forwardCurves.loc[date, col] = disFactDerivative
-      forwardCurves.loc[date, col] = finalDisFacts.loc[date, col]
-      #forwardCurves.loc[date, col] = np.interp(disFactDerivative, date, finalDisFacts.loc[date, col])
+from discountFactorParYield import calcDisFact
+from forward_curve import ForwardCurve, par_yield_maturities
 
-  return forwardCurves
 
-def graph(pd):
-  maturities = pd.columns
-  maturitiesNumeric = []
-  for maturity in maturities:
-    if "Mo" in maturity:
-      str = maturity.split()
-      maturity = round(float(str[0]) / 12, 3)
-      maturitiesNumeric.append(maturity)
-    else:
-      str = maturity.split()
-      maturity = float(str[0])
-      maturitiesNumeric.append(maturity)
-  
-  for date in pd.index:
-    forward = pd.loc[date].to_numpy(dtype = float)
-    forward = -np.log(forward)
-    interp = PchipInterpolator(maturitiesNumeric, forward).derivative()
-    denseTimes = np.linspace(maturitiesNumeric[0], maturitiesNumeric[-1], 500)
-    denseForward = interp(denseTimes)
-    plt.plot(denseTimes, denseForward, label = date + " Interpolated")
-    #plt.plot(maturitiesNumeric, pd.loc[date], marker = 'o', label = date)  
+def graph(df: pd.DataFrame):
+    # tenors and times used in plot
+    tenors = par_yield_maturities(df.columns)
+    times = np.linspace(tenors[0], tenors[-1], num=500)
+    # for each date
+    for date in df.index:
+        # discount factors + forward curve
+        dfs = df.loc[date].values
+        curve = ForwardCurve(dfs, tenors)
+        # plot
+        plt.plot(
+            times,
+            curve(times),
+            label=f"{date} ({curve.interpolator().__name__})"
+        )
+    # set plot properties
+    plt.xlabel("Maturity (Years)")
+    plt.ylabel(f"Forward Rate")
+    plt.title(f"Instantaneous Treasury Forward Curves")
+    # show grid + legend + display
+    plt.grid()
+    plt.legend()
+    plt.show()
 
-  plt.xlabel('Maturity (Converted to years for uniformity)')
-  plt.ylabel('Forward Rate')
-  plt.title('Forward Curves of Discount Factors')
-  plt.legend()
-  plt.grid(True)
-  plt.show()
 
-def main():
-  #yieldsDF = calcYields('daily-treasury-par-yield-curve-rates.csv')
-  forwardCurves = forwardCurve('../csvs/daily-treasury-par-yield-curve-rates.csv')
-  print(forwardCurves)
-  graph(forwardCurves)
-  pass
+def main() -> int:
+    graph(calcDisFact('../csvs/daily-treasury-par-yield-curve-rates.csv'))
+    return 0
+
 
 if __name__ == "__main__":
-  main()
+    sys.exit(main())
