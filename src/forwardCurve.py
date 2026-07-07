@@ -5,7 +5,7 @@ import pandas as pd
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.interpolate import PchipInterpolator
+from scipy.interpolate import CubicSpline
 
 def forwardCurve(name: str):
   finalDisFacts = calcDisFact(name)
@@ -28,8 +28,8 @@ def forwardCurve(name: str):
 
   return forwardCurves
 
-def graph(pd):
-  maturities = pd.columns
+def graph(df):
+  maturities = df.columns
   maturitiesNumeric = []
   for maturity in maturities:
     if "Mo" in maturity:
@@ -40,15 +40,15 @@ def graph(pd):
       str = maturity.split()
       maturity = float(str[0])
       maturitiesNumeric.append(maturity)
-  
-  for date in pd.index:
-    forward = pd.loc[date].to_numpy(dtype = float)
+ 
+  for date in df.index:
+    forward = df.loc[date].to_numpy(dtype = float)
     forward = -np.log(forward)
-    interp = PchipInterpolator(maturitiesNumeric, forward).derivative()
+    interp = CubicSpline(maturitiesNumeric, forward).derivative()
     denseTimes = np.linspace(maturitiesNumeric[0], maturitiesNumeric[-1], 500)
     denseForward = interp(denseTimes)
     plt.plot(denseTimes, denseForward, label = date + " Interpolated")
-    #plt.plot(maturitiesNumeric, pd.loc[date], marker = 'o', label = date)  
+    #plt.plot(maturitiesNumeric, pd.loc[date], marker = 'o', label = date)
 
   plt.xlabel('Maturity (Converted to years for uniformity)')
   plt.ylabel('Forward Rate')
