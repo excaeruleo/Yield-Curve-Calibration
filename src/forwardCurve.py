@@ -12,7 +12,7 @@ def forwardCurve(name: str):
   forwardCurves = pd.DataFrame(index = finalDisFacts.index, columns = finalDisFacts.columns, dtype = float)
   #print(forwardCurves)
   maturities = np.array(forwardCurves.columns)
-  #print(maturities) 
+  #print(maturities)
   for d, date in enumerate(forwardCurves.index):
     for i, col in enumerate(forwardCurves.columns):
       if "Mo" in col:
@@ -40,7 +40,7 @@ def graph(df):
       str = maturity.split()
       maturity = float(str[0])
       maturitiesNumeric.append(maturity)
- 
+
   for date in df.index:
     forward = df.loc[date].to_numpy(dtype = float)
     forward = -np.log(forward)
