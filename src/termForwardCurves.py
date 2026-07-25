@@ -30,7 +30,7 @@ def graph(df):
       t = denseTimes[denseTimes + tau <= maturitiesNumeric[-1]]
       forward = (spline(t) - spline(t + tau)) / tau
       ax.set_xlabel('t')
-      ax.set_ylabel(f"f(0, t, t + {tau}")
+      ax.set_ylabel(f"f(0, t, t + {tau})")
       ax.set_title(f"{tau}y continuously compounded Treasury forward rates")
       ax.grid(True)
       ax.plot(t, forward, label = date)
