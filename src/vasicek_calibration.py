@@ -2,7 +2,9 @@
 
 Instantaneous forward curves are constructed as part of the calibration process
 and the least-squares bounded optimization is done using SciPy's implementation
-of a constrained trust-region algorithm for robustness. The final
+of a constrained trust-region algorithm for robustness. Individual plots are
+created for each calibration date comparing cubic spline interpolated bootstrap
+vs. the calibrated Vasicek Treasury zero bond prices.
 """
 
 from pathlib import Path
@@ -197,7 +199,7 @@ def main() -> int:
     """Main function for the script.
 
     This bootstraps discount factors from par rates, prints the values, and
-    produces a graph of the calibrated Vasicek discount factors.
+    produces a graph of the calibrated Vasicek vs. bootstrap discount factors.
     """
     dfs = calcDisFact(
         _script_dir /
