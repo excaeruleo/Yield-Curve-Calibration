@@ -122,16 +122,6 @@ class VasicekObjective:
         x : np.ndarray
             Vasicek parameters [a, b, sigma] to optimize over
         """
-        """
-        # Vasicek A(t) result vector
-        va = (1 - np.exp(-x[0] * self.t)) / x[0]
-        # Vasicek C(t) result vector
-        vc = (
-            x[1] * (va - self.t) +
-            0.5 * np.pow(x[2] / x[0], 2) *
-            (self.t + 0.5 * (1 - np.exp(-2 * x[0] * self.t)) / x[0] - 2 * va)
-        )
-        """
         # use parameters to construct Vasicek log-bond
         vlz = VasicekLogBond(self.r, x[0], x[1], x[2])
         # compute vectorized differences of actual and Vasicek log-bond prices
