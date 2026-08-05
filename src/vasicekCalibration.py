@@ -16,7 +16,7 @@ class calcVectors:
 
   def __call__(self, t:np.ndarray) -> np.ndarray:
     va = (1 - np.exp(-self.a * t)) / self.a
-    vc = (self.b * (va - t) + 0.5 * math.pow(self.sigma / self.a, 2) * (t + 0.5 * 
+    vc = (self.b * (va - t) + 0.5 * np.power(self.sigma / self.a, 2) * (t + 0.5 * 
     (1 - np.exp(-2 * self.a * t)) / self.a - 2 * va))
     return -self.r * va + vc
 
